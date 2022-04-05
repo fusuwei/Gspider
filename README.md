@@ -42,6 +42,7 @@ func UA(ctx *gspider.Context) {
 
 示例：
 
-> 无队列：
+> 无队列：[notQueue](https://github.com/FuSuwei/Gspider/tree/master/examples/notQueue)
 
-> rabbitmq:
+> rabbitmq: [rabbitmq](https://github.com/FuSuwei/Gspider/tree/master/examples/rabbitmq)
+
