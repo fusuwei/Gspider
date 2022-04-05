@@ -173,6 +173,9 @@ func (g *GSpider) producer(ctx *Context) {
 
 func (g *GSpider) down(ctx *Context) {
 	status := false
+	ok := false
+	var err error
+	var res *response.Response
 	defer func() {
 		if !status {
 			g.workers.Finish(ctx, false)
@@ -182,23 +185,34 @@ func (g *GSpider) down(ctx *Context) {
 		g.Logger.Errorf("请求体为空")
 		return
 	}
-	g.Logger.Debugf("开始请求：%s", ctx.Request.Url.String())
-	res, err := ctx.Session.Request(ctx.Request)
-	if err != nil {
-		g.Logger.Errorf("请求失败，error: %s", err.Error())
-		return
-	}
-	flag := false
-	for _, statusCode := range g.AllowCode {
-		if res.Resp.StatusCode == statusCode {
-			flag = true
+	for i := 0; i < (ctx.Request.Retry + 1); i++ {
+		g.Logger.Debugf("开始请第%d次：%s", i+1, ctx.Request.Url.String())
+		res, err = ctx.Session.Request(ctx.Request)
+		if err != nil {
+			g.Logger.Errorf("请求失败，error: %s", err.Error())
+			continue
+		}
+		flag := false
+		for _, statusCode := range g.AllowCode {
+			if res.Resp.StatusCode == statusCode {
+				flag = true
+				ok = true
+			}
+		}
+		if ok {
+			break
+		}
+		if !flag {
+			g.Logger.Warnf("状态码错误, status code: %d", res.Resp.StatusCode)
+			continue
 		}
 	}
-	if !flag {
-		g.Logger.Warnf("状态码错误")
+	if ok {
+		status = true
+	} else {
+		status = false
 		return
 	}
-
 	if g.KeepSession {
 		g.session = ctx.Session
 	}
