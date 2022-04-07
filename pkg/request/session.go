@@ -20,7 +20,7 @@ type Session struct {
 	UA             string
 	Header         map[string]string
 	cookie         *cookiejar.Jar
-	client         *http.Client
+	Client         *http.Client
 }
 
 func New(host string, timeout time.Duration, verify bool, allowRedirects bool, header map[string]string) *Session {
@@ -54,7 +54,7 @@ func New(host string, timeout time.Duration, verify bool, allowRedirects bool, h
 	} else {
 		client.Jar = jar
 	}
-	session.client = client
+	session.Client = client
 	return session
 }
 
@@ -97,7 +97,7 @@ func (s *Session) Request(req *Request) (*response.Response, error) {
 		request.Header.Set("user-agent", s.UA)
 	}
 
-	res, err := s.client.Do(request)
+	res, err := s.Client.Do(request)
 	if err != nil {
 		return nil, err
 	}
