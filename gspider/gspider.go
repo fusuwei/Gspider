@@ -219,6 +219,7 @@ func (g *GSpider) down(ctx *Context) {
 	ctx.Response = res
 	ctx.NextNode = constant.CallbackNode
 	status = true
+	ctx.indexes[ctx.NextNode] = -1
 	g.workers.PushWaitTask(ctx)
 }
 
@@ -246,6 +247,7 @@ func (g *GSpider) call(ctx *Context) {
 			return
 		}
 		ctx.NextNode = node
+		ctx.indexes[ctx.NextNode] = -1
 		g.workers.PushWaitTask(ctx)
 	}
 }
