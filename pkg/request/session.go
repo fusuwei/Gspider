@@ -101,6 +101,6 @@ func (s *Session) Request(req *Request) (*response.Response, error) {
 	if err != nil {
 		return nil, err
 	}
-	resp := response.New(res, req.Callback, req.Meta)
+	resp := response.New(req.Url, res, req.Callback, req.Meta)
 	return resp, nil
 }

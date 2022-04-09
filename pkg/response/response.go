@@ -6,11 +6,13 @@ import (
 	"github.com/fusuwei/gspider/pkg/xpath"
 	"io/ioutil"
 	"net/http"
+	"net/url"
 	"strings"
 )
 
 type Response struct {
 	Resp     *http.Response
+	Url      *url.URL
 	Content  []byte
 	Text     string
 	Callback string
@@ -18,9 +20,10 @@ type Response struct {
 	Dom      *xpath.Select
 }
 
-func New(res *http.Response, callback string, meta map[string]interface{}) *Response {
+func New(u *url.URL, res *http.Response, callback string, meta map[string]interface{}) *Response {
 	defer res.Body.Close()
 	response := &Response{
+		Url:      u,
 		Resp:     res,
 		Callback: callback,
 		Meta:     meta,

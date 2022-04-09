@@ -51,7 +51,7 @@ func TestRabbitMQ_Start(t *testing.T) {
 		fmt.Println(err)
 		return
 	}
-	r.Start()
+	r.Start(10)
 	time.Sleep(time.Second * 30)
 }
 
@@ -86,7 +86,7 @@ func TestRabbitMQ_Routing(t *testing.T) {
 		fmt.Println(err)
 		return
 	}
-	r.Start()
+	r.Start(10)
 	time.Sleep(time.Second * 30)
 }
 

@@ -2,6 +2,7 @@ package gspider
 
 import (
 	"errors"
+	"fmt"
 	"github.com/fusuwei/gspider/pkg/constant"
 	"github.com/fusuwei/gspider/pkg/logger"
 	"github.com/fusuwei/gspider/pkg/queue"
@@ -186,6 +187,10 @@ func (g *GSpider) down(ctx *Context) {
 		return
 	}
 	for i := 0; i < (ctx.Request.Retry + 1); i++ {
+		if g.DownloadDelay != 0 {
+			g.Logger.Debugf(fmt.Sprintf("延迟%d秒请求", g.DownloadDelay))
+			time.Sleep(time.Second * time.Duration(g.DownloadDelay))
+		}
 		g.Logger.Debugf("开始请第%d次：%s", i+1, ctx.Request.Url.String())
 		res, err = ctx.Session.Request(ctx.Request)
 		if err != nil {
@@ -262,6 +267,12 @@ func (g *GSpider) save(ctx *Context) {
 		g.workers.Finish(ctx, false)
 		return
 	}
+	if ctx.Item.NextPage != nil {
+		if ctx.Item.NextPageNode == constant.EmptyNode {
+			g.Logger.Warnf("next page node is empty node")
+		}
+		go g.submit(ctx.Item.NextPage, ctx.Item.NextPageNode)
+	}
 	g.workers.Finish(ctx, true)
 }
 
@@ -291,6 +302,9 @@ func (g *GSpider) dispatch() {
 				go g.call(work)
 			case constant.SaveNode:
 				go g.save(work)
+			case constant.EmptyNode:
+				g.workers.Finish(work, true)
+
 			}
 		}
 	}

@@ -8,11 +8,11 @@ import (
 
 func TestQueue(t *testing.T) {
 	queue := NewQueue("admin", "eyJrZXlJZCI6ImFtcXAtdzRteDd4emtuZXEyIiwiYWxnIjoiSFMyNTYifQ.eyJzdWIiOiJhbXFwLXc0bXg3eHprbmVxMl9hZG1pbiJ9.C2aZz2xIAENZRhg3PRTPqsNIF0zB2865NWOQUhJOQvQ",
-		"amqp-w4mx7xzkneq2.rabbitmq.ap-gz.public.tencenttdmq.com", "amqp-w4mx7xzkneq2|gspider", 5672, "test", 10)
+		"amqp-w4mx7xzkneq2.rabbitmq.ap-gz.public.tencenttdmq.com", "amqp-w4mx7xzkneq2|gspider", 5672, "test")
 	//
 	//queue := NewQueue("admin", "123456", "127.0.0.1", "", 5672, "test", 10)
 
-	queue.Start()
+	queue.Start(10)
 
 	//go func() {
 	//	for i := 0; i < 100; i++ {
