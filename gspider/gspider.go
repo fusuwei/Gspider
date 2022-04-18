@@ -44,7 +44,6 @@ type GSpider struct {
 func Default() *GSpider {
 	return &GSpider{
 		RequestSetting: &request.Setting{
-			Host:           "",
 			Timeout:        30,
 			Verify:         false,
 			AllowRedirects: false,
@@ -82,9 +81,9 @@ func (g *GSpider) init(spider Spider, queue queue.Queue, save storage.Saver) {
 		} else {
 			timeout = time.Second * 30
 		}
-		g.session = request.New(g.RequestSetting.Host, timeout, g.RequestSetting.Verify, g.RequestSetting.AllowRedirects, g.RequestSetting.Header)
+		g.session = request.New(timeout, g.RequestSetting.Verify, g.RequestSetting.AllowRedirects)
 	} else {
-		g.session = request.New("", time.Second*30, false, false, nil)
+		g.session = request.New(time.Second*30, false, false)
 	}
 }
 

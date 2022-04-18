@@ -14,6 +14,10 @@ type Request struct {
 	Callback string
 	Meta     map[string]interface{}
 	Retry    int
+
+	UA       string
+	Header   map[string]string
+	Proxy    string
 }
 
 func (r *Request) ToPublish() string {

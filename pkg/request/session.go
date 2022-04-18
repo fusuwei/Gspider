@@ -8,29 +8,29 @@ import (
 	"io"
 	"net/http"
 	"net/http/cookiejar"
+	"net/url"
 	"strings"
 	"time"
 )
 
 type Session struct {
-	Host           string
 	Timeout        time.Duration
 	Verify         bool // 是否验证证书
-	AllowRedirects bool // 禁止跳转
-	UA             string
-	Header         map[string]string
-	cookie         *cookiejar.Jar
+	AllowRedirects bool // 是否禁止跳转
 	Client         *http.Client
+	Transport      *http.Transport
 }
 
-func New(host string, timeout time.Duration, verify bool, allowRedirects bool, header map[string]string) *Session {
+func New(timeout time.Duration, verify bool, allowRedirects bool) *Session {
 	session := &Session{
-		Host:           host,
 		Timeout:        timeout,
 		Verify:         verify,
 		AllowRedirects: allowRedirects,
-		Header:         header,
-		cookie:         nil,
+		Transport: &http.Transport{
+			TLSClientConfig: &tls.Config{
+				InsecureSkipVerify: verify,
+			},
+		},
 	}
 	client := &http.Client{
 		Timeout: timeout,
@@ -39,11 +39,6 @@ func New(host string, timeout time.Duration, verify bool, allowRedirects bool, h
 		client.CheckRedirect = func(req *http.Request, via []*http.Request) error {
 			return http.ErrUseLastResponse
 		}
-	}
-	client.Transport = &http.Transport{
-		TLSClientConfig: &tls.Config{
-			InsecureSkipVerify: verify,
-		},
 	}
 
 	options := cookiejar.Options{
@@ -84,19 +79,26 @@ func (s *Session) Request(req *Request) (*response.Response, error) {
 	if err != nil {
 		return nil, err
 	}
-
+	// 设置headers
 	request.Header.Set("content-type", contentType)
-	for k, v := range s.Header {
-		if strings.ToLower(k) == "user-agent" && s.UA != "" {
-			request.Header.Set("user-agent", s.UA)
+	for k, v := range req.Header {
+		if strings.ToLower(k) == "user-agent" && req.UA != "" {
+			request.Header.Set("user-agent", req.UA)
 			continue
 		}
 		request.Header.Set(k, v)
 	}
-	if request.Header.Get("user-agent") == "" && s.UA != "" {
-		request.Header.Set("user-agent", s.UA)
+	if request.Header.Get("user-agent") == "" && req.UA != "" {
+		request.Header.Set("user-agent", req.UA)
 	}
 
+	transport := s.Transport.Clone()
+	if req.Proxy != "" {
+		if p, err := url.Parse(req.Proxy); err == nil {
+			transport.Proxy = http.ProxyURL(p)
+		}
+	}
+	s.Client.Transport = transport
 	res, err := s.Client.Do(request)
 	if err != nil {
 		return nil, err

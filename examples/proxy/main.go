@@ -14,8 +14,8 @@ import (
 type Test struct {
 }
 
-func (b *Test) Producer(f func(request *request.Request, nextNode constant.Node))  {
-	for i := 0; i < 500; i++ {
+func (b *Test) Producer(f func(request *request.Request, nextNode constant.Node)) {
+	for i := 0; i < 2; i++ {
 		u, err := url.Parse("http://47.118.61.27:30201/get")
 		if err != nil {
 			continue
@@ -54,5 +54,6 @@ func main() {
 	//m.OpenConnection()
 	//T := TestSaver{mysql: m}
 	g.Use(constant.RequestNode, middleware.UA)
+	g.Use(constant.RequestNode, middleware.SetProxy)
 	g.Run(&Test{}, nil, nil)
 }

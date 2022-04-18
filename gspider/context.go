@@ -9,7 +9,6 @@ import (
 )
 
 type Context struct {
-	Proxy         map[string]string
 	Session       *request.Session
 	Request       *request.Request
 	Response      *response.Response

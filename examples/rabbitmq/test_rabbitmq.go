@@ -71,11 +71,9 @@ func main() {
 
 	g := gspider.GSpider{
 		RequestSetting: &request.Setting{
-			Host:           "",
 			Timeout:        30,
 			Verify:         false,
 			AllowRedirects: false,
-			Header:         nil,
 		},
 		GSize:         1,
 		AllowCode:     []int{200, 400},
